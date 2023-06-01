@@ -3,7 +3,6 @@ package com.example.emojisemanticsearch
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,15 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.emojisemanticsearch.ui.theme.EmojiSemanticSearchTheme
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,16 +34,6 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Column (modifier = Modifier.fillMaxSize()) {
-                        val systemUiController = rememberSystemUiController()
-                        val useDarkIcons = MaterialTheme.colors.isLight
-
-                        SideEffect {
-                            systemUiController.setSystemBarsColor(
-                                color = Color.Transparent,
-                                darkIcons = useDarkIcons
-                            )
-                        }
-
                         SearchEmoji(modifier = Modifier.fillMaxWidth())
                     }
                 }
@@ -67,29 +53,6 @@ fun SearchEmoji(modifier: Modifier) {
         onValueChange = { searchText = it },
         modifier = modifier.padding(10.dp)
     )
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-
-    Text(
-        text = "Hello $name!",
-        modifier = modifier.clickable {
-            scope.launch {
-                saveToClipboard(context, "Hello $name!")
-            }
-        }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    EmojiSemanticSearchTheme {
-        Greeting("Android")
-    }
 }
 
 @Preview(showBackground = true)
