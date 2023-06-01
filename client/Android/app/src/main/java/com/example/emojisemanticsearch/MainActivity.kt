@@ -19,6 +19,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +31,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.emojisemanticsearch.entity.EmojiEntity
 import com.example.emojisemanticsearch.ui.theme.EmojiSemanticSearchTheme
 
@@ -42,9 +45,20 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Column (modifier = Modifier.fillMaxSize()) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        val viewModel: MainViewModel = viewModel()
+                        val uiState by viewModel.uiState.collectAsState()
+                        LaunchedEffect(key1 = true) {
+                            viewModel.fetchSuccessAfter2s()
+                        }
+
                         SearchEmoji(modifier = Modifier.fillMaxWidth())
-                        DisplayEmoji(modifier = Modifier.fillMaxWidth())
+                        if (uiState is UiState.Success) {
+                            DisplayEmoji(
+                                (uiState as UiState.Success).data,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
             }
@@ -53,40 +67,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun DisplayEmoji(modifier: Modifier = Modifier) {
-    val emojiItems = listOf(
-        EmojiEntity("🐶", "Dog"),
-        EmojiEntity("🐱", "Cat"),
-        EmojiEntity("🐭", "Mouse"),
-        EmojiEntity("🐹", "Hamster"),
-        EmojiEntity("🐰", "Rabbit"),
-        EmojiEntity("🦊", "Fox"),
-        EmojiEntity("🐻", "Bear"),
-        EmojiEntity("🐼", "Panda"),
-        EmojiEntity("🐻‍❄️", "Polar Bear"),
-        EmojiEntity("🐶", "Dog"),
-        EmojiEntity("🐱", "Cat"),
-        EmojiEntity("🐭", "Mouse"),
-        EmojiEntity("🐹", "Hamster"),
-        EmojiEntity("🐰", "Rabbit"),
-        EmojiEntity("🦊", "Fox"),
-        EmojiEntity("🐻", "Bear"),
-        EmojiEntity("🐼", "Panda"),
-        EmojiEntity("🐻‍❄️", "Polar Bear"),
-        EmojiEntity("🐶", "Dog"),
-        EmojiEntity("🐱", "Cat"),
-        EmojiEntity("🐭", "Mouse"),
-        EmojiEntity("🐹", "Hamster"),
-        EmojiEntity("🐰", "Rabbit"),
-        EmojiEntity("🦊", "Fox"),
-        EmojiEntity("🐻", "Bear"),
-        EmojiEntity("🐼", "Panda"),
-        EmojiEntity("🐻‍❄️", "Polar Bear")
-    )
-
+fun DisplayEmoji(emojiData: List<EmojiEntity>, modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier.padding(horizontal = 10.dp)) {
-        items(emojiItems.size) { index ->
-            EmojiItem(emojiItems[index])
+        items(emojiData.size) { index ->
+            EmojiItem(emojiData[index])
         }
     }
 }
@@ -94,7 +78,7 @@ fun DisplayEmoji(modifier: Modifier = Modifier) {
 @Composable
 fun EmojiItem(emojiEntity: EmojiEntity) {
     val context = LocalContext.current
-    Row (modifier = Modifier.clickable {
+    Row(modifier = Modifier.clickable {
         saveToClipboard(context, emojiEntity.emoji)
         Toast.makeText(
             context,
@@ -116,7 +100,7 @@ fun EmojiItem(emojiEntity: EmojiEntity) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchEmoji(modifier: Modifier) {
-    var searchText by remember { mutableStateOf(TextFieldValue(""))}
+    var searchText by remember { mutableStateOf(TextFieldValue("")) }
     val context = LocalContext.current
 
     TextField(
