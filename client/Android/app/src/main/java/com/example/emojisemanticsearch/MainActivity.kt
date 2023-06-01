@@ -84,7 +84,7 @@ fun DisplayEmoji(modifier: Modifier = Modifier) {
         EmojiEntity("🐻‍❄️", "Polar Bear")
     )
 
-    LazyColumn(modifier = modifier) {
+    LazyColumn(modifier = modifier.padding(horizontal = 10.dp)) {
         items(emojiItems.size) { index ->
             EmojiItem(emojiItems[index])
         }
