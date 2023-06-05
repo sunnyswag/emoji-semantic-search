@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.emojisemanticsearch.entity.EmojiEntity
 import com.example.emojisemanticsearch.ui.theme.EmojiSemanticSearchTheme
+import com.example.emojisemanticsearch.utils.saveToClipboard
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
