@@ -3,22 +3,27 @@ package com.example.emojisemanticsearch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.emojisemanticsearch.entity.EmojiEntity
+import com.example.emojisemanticsearch.network.EmbeddingRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.dsl.module
 
-class MainViewModel: ViewModel() {
+class MainViewModel(
+    private val embeddingRepository: EmbeddingRepository
+): ViewModel() {
     private var _uiState = MutableStateFlow<UiState>(UiState.Default)
     val uiState get() = _uiState
+
 
     fun fetchSuccessAfter2s() {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             withContext(Dispatchers.IO) {
-                delay(2000)
-                _uiState.emit(UiState.Success(testData()))
+                 val result = embeddingRepository.getEmbedding("test")
+                _uiState.emit(UiState.Success(testData(), result))
             }
         }
     }
@@ -54,9 +59,13 @@ class MainViewModel: ViewModel() {
     )
 }
 
+val viewModelModule = module {
+    viewModel { MainViewModel(get()) }
+}
+
 sealed class UiState {
     object Loading: UiState()
-    data class Success(val data: List<EmojiEntity>): UiState()
+    data class Success(val data: List<EmojiEntity>, val embeddingTest: String): UiState()
     data class Error(val message: String): UiState()
     object Default: UiState()
 }
